@@ -33,3 +33,14 @@ Saving to "bird.wav-s2048-o220-p8.png"
 
 [Parus major 15mars2011 [wikipedia]](http://en.wikipedia.org/wiki/File:Parus_major_15mars2011.ogg)  
 ![bird spectrogram](https://raw.github.com/plredmond/spectrogrampy/master/examples/bird.wav-s2048-o220-p8.png)
+
+Enjoy!
+
+-- [PLR](http://f06mote.com)
+
+---
+
+* numpy (1.8.0)
+* scipy (0.13.3)
+* Pillow (2.3.0)
+* Python 3.3.3
