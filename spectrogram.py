@@ -33,11 +33,13 @@ def make_spectrogram(stream, stride, offset):
     if len(raw_ffts.shape) != 2:
         raise ValueError('Result was not rectangular: %s' % raw_ffts.shape)
     print('Shape is', raw_ffts.shape, file=sys.stderr)
-    # mask values LE 0, scale to 10*log10, fill in masked values as minimum value
+    # mask values LE 1
     masked_ffts = numpy.ma.masked_array(raw_ffts, mask=raw_ffts<1)
     del raw_ffts
+    # scale to 10*log10 (db scale)
     scaled_ffts = 10 * numpy.log10(masked_ffts)
     del masked_ffts
+    # fill in min value for masked values
     filled_ffts = scaled_ffts.filled(scaled_ffts.min())
     del scaled_ffts
     return filled_ffts 
