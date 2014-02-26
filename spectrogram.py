@@ -42,11 +42,6 @@ def make_spectrogram(stream, stride, offset):
     del scaled_ffts
     return filled_ffts 
 
-def normalize(ar):
-    '''Shift and scale the array onto the range 0..1'''
-    sh = ar - ar.min()
-    return sh / sh.max()
-
 def save_image(ar, filename):
     '''Save an image from a 2D brightness array'''
     ar -= ar.min() # shifted to 0..max
@@ -67,9 +62,9 @@ def main(args):
     rate, data = wavfile.read(args.wav_file, mmap=args.mmap)
     print('Wav sample rate: %d' % rate, file=sys.stderr)
     sg = make_spectrogram(data, args.stride, args.offset)
-    emphasized = sg ** args.power
+    sg **= args.power # squish smaller values down
     print('Saving to "%s"' % args.image_file)
-    return save_image(emphasized, args.image_file)
+    return save_image(sg, args.image_file)
 
 if __name__ == '__main__':
     DEF_STRIDE = 512
