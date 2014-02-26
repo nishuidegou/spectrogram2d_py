@@ -16,7 +16,7 @@ Shape is (99, 257)
 Saving to "examples/mel.wav-s512-o441-p4.png"
 ```
 
-[mel.wav](https://raw.github.com/plredmond/spectrogrampy/master/examples/mel.wav)
+[mel.wav](https://raw.github.com/plredmond/spectrogrampy/master/examples/mel.wav)  
 ![mel spectrogram](https://raw.github.com/plredmond/spectrogrampy/master/examples/mel.wav-s512-o441-p4.png)
 
 #### Bird call (source: Wikipedia)
@@ -31,5 +31,5 @@ Shape is (1132, 1025)
 Saving to "bird.wav-s2048-o220-p8.png"
 ```
 
-[Parus major 15mars2011](http://en.wikipedia.org/wiki/File:Parus_major_15mars2011.ogg)
-![bird spectrogram](https://raw.github.com/plredmond/spectrogrampy/master/examples/bird.wav-s2048-o220-p4.png)
+[Parus major 15mars2011 [wikipedia]](http://en.wikipedia.org/wiki/File:Parus_major_15mars2011.ogg)  
+![bird spectrogram](https://raw.github.com/plredmond/spectrogrampy/master/examples/bird.wav-s2048-o220-p8.png)
