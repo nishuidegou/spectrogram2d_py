@@ -11,9 +11,6 @@ import scipy.io.wavfile as wavfile
 
 const = lambda _, a: a
 
-def readwav(wav_file):
-    return wavfile.read(wav_file)[1]
-
 def make_spectrogram(stream, stride, offset):
     '''sequence num -> num -> num -> sequence (sequence num)
     
@@ -67,7 +64,9 @@ def main(args):
     print('Stride: %d' % args.stride, file=sys.stderr)
     print('Offset: %d' % args.offset, file=sys.stderr)
     print('Power: %d' % args.power, file=sys.stderr)
-    sg = make_spectrogram(readwav(args.wav_file), args.stride, args.offset)
+    rate, data = wavfile.read(args.wav_file, mmap=args.mmap)
+    print('Wav sample rate: %d' % rate, file=sys.stderr)
+    sg = make_spectrogram(data, args.stride, args.offset)
     emphasized = sg ** args.power
     print('Saving to "%s"' % args.image_file)
     return save_image(emphasized, args.image_file)
@@ -76,12 +75,14 @@ if __name__ == '__main__':
     DEF_STRIDE = 512
     DEF_OFFSET = 44100//100
     DEF_POWER = 4
+    DEF_MMAP = False
     ap = argparse.ArgumentParser(description="Generate a spectrogram from a wav file.")
     ap.add_argument('wav_file', help='A path to the wav file to generate a spectrogram of.')
-    ap.add_argument('-f', '--image_file', help='An output path to write the image. Default uses other arguments.')
+    ap.add_argument('-f', '--image_file', metavar='path', help='An output path to write the image. Default uses the name of the wav file and the settings used to generate the spectrogram.')
     ap.add_argument('-s', '--stride', metavar='int', help='Default: %d. Use this many samples in each time slice of the spectrogram. Bigger increases frequency range (bigger image y resolution).' % DEF_STRIDE, type=int, default=DEF_STRIDE)
     ap.add_argument('-o', '--offset', metavar='int', help='Default: %d. Offset successive chunks by this many samples. You\'ll have one vertical row of information per offset. Bigger skips more time between slices in the spectrogram (smaller x resolution).' % DEF_OFFSET, type=int, default=DEF_OFFSET)
     ap.add_argument('-p', '--power', metavar='int', help='Default: %d. Filter out noise by raising the whole spectrogram to this power. Bigger emphasizes the loud noises more (darker image).' % DEF_POWER, type=int, default=DEF_POWER)
+    ap.add_argument('-m', '--mmap', help='Default: %s. Memory-map the wav file? This might help loading of large files.' % DEF_MMAP, default=DEF_MMAP, action='store_true')
     exit(main(ap.parse_args()))
 
 Args = collections.namedtuple('Args', [
@@ -89,6 +90,7 @@ Args = collections.namedtuple('Args', [
         'slices',
         'overlap',
         'power',
+        'mmap',
     ])
 
 # eof
