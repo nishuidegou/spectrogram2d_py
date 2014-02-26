@@ -51,8 +51,10 @@ def normalize(ar):
     return sh / sh.max()
 
 def save_image(ar, filename):
-    '''Save an image from a 2D brightness array on the range 0..1'''
-    pixels = (ar * 255).round().astype('int8')
+    '''Save an image from a 2D brightness array'''
+    ar -= ar.min() # shifted to 0..max
+    ar *= 255 / ar.max() # scaled to 0..255
+    pixels = ar.round().astype('int8')
     im = Image.fromarray(numpy.fliplr(pixels).transpose(), mode='L')
     try:
         im.save(filename)
@@ -66,7 +68,7 @@ def main(args):
     print('Offset: %d' % args.offset, file=sys.stderr)
     print('Power: %d' % args.power, file=sys.stderr)
     sg = make_spectrogram(readwav(args.wav_file), args.stride, args.offset)
-    emphasized = normalize(sg ** args.power)
+    emphasized = sg ** args.power
     print('Saving to "%s"' % args.image_file)
     return save_image(emphasized, args.image_file)
 
