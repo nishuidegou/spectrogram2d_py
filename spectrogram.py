@@ -22,7 +22,7 @@ def make_spectrogram(stream, stride, offset):
     starts = range(0, len(stream) - stride, offset)
     chunks = (stream[n:n + stride] for n in starts)
     # compute ffts and abs their results
-    raw_ffts = numpy.abs(numpy.array(
+    ffts = numpy.abs(numpy.array(
         [ const( print( '\r%d/%d fft, %d%%\t\t\t'
                       % (n, len(starts), n / len(starts) * 100), end='', file=sys.stderr)
                , numpy.fft.rfft(c)
@@ -30,19 +30,14 @@ def make_spectrogram(stream, stride, offset):
           for n, c in zip(itertools.count(), chunks)
         ]))
     print(file=sys.stderr)
-    if len(raw_ffts.shape) != 2:
-        raise ValueError('Result was not rectangular: %s' % raw_ffts.shape)
-    print('Shape is', raw_ffts.shape, file=sys.stderr)
-    # mask values LE 1
-    masked_ffts = numpy.ma.masked_array(raw_ffts, mask=raw_ffts<1)
-    del raw_ffts
-    # scale to 10*log10 (db scale)
-    scaled_ffts = 10 * numpy.log10(masked_ffts)
-    del masked_ffts
-    # fill in min value for masked values
-    filled_ffts = scaled_ffts.filled(scaled_ffts.min())
-    del scaled_ffts
-    return filled_ffts 
+    if len(ffts.shape) != 2:
+        raise ValueError('Result was not rectangular: {}'.format(ffts.shape))
+    print('Shape is', ffts.shape, file=sys.stderr)
+    # make 1 the minimum value
+    ffts[ffts < 1] = 1
+    # scale to something like dB
+    return 10 * numpy.log10(ffts ** 2)
+
 
 def save_image(ar, filename):
     '''Save an image from a 2D brightness array'''
@@ -63,6 +58,12 @@ def main(args):
     print('Power: %d' % args.power, file=sys.stderr)
     rate, data = wavfile.read(args.wav_file, mmap=args.mmap)
     print('Wav sample rate: %d' % rate, file=sys.stderr)
+    print('Wav stream shape: {}'.format(data.shape), file=sys.stderr)
+    if len(data.shape) == 2:
+        data = (data[:,0] + data[:,1]) / 2
+    elif len(data.shape) > 2:
+        raise ValueError('Multichannel')
+    print('Wav stream shape: {}'.format(data.shape), file=sys.stderr)
     sg = make_spectrogram(data, args.stride, args.offset)
     sg **= args.power # squish smaller values down
     print('Saving to "%s"' % args.image_file)
