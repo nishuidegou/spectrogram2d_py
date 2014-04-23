@@ -40,7 +40,4 @@ Enjoy!
 
 ---
 
-* numpy (1.8.0)
-* scipy (0.13.3)
-* Pillow (2.3.0)
-* Python 3.3.3
+At least *Python 3.3.3 - 3.4*
