@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import math
 import numpy
 import argparse
 import itertools
@@ -19,15 +20,19 @@ def make_spectrogram(stream, stride, offset):
     '''
     if stride < offset:
         print('WARNING: Stride is less than offset, which will cause data to be skipped.', file=sys.stderr)
+    # determine where each chunk of audio starts
     starts = range(0, len(stream) - stride, offset)
+    # split the stream into stride-long chunks whose beginnings increase by offset
     chunks = (stream[n:n + stride] for n in starts)
+    # smooth the ends of each chunk to silence
+    windowed = map(window, chunks)
     # compute ffts and abs their results
     ffts = numpy.abs(numpy.array(
         [ const( print( '\r%d/%d fft, %d%%\t\t\t'
                       % (n, len(starts), n / len(starts) * 100), end='', file=sys.stderr)
-               , numpy.fft.rfft(c)
+               , numpy.fft.rfft(wwav)
                )
-          for n, c in zip(itertools.count(), chunks)
+          for n, wwav in zip(itertools.count(), windowed)
         ]))
     print(file=sys.stderr)
     if len(ffts.shape) != 2:
@@ -38,6 +43,16 @@ def make_spectrogram(stream, stride, offset):
     # scale to something like dB
     return 10 * numpy.log10(ffts ** 2)
 
+def window(chunk):
+    ct = len(chunk)
+    return [hamming(n, ct) * samp for n, samp in enumerate(chunk)]
+
+def hamming(n, ct):
+    '''Int, Int -> Float'''
+    a = 0.53836
+    b = 0.46164
+    rat = n / ct
+    return a - b * math.cos(2 * math.pi * rat)
 
 def save_image(ar, filename):
     '''Save an image from a 2D brightness array'''
