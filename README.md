@@ -1,4 +1,4 @@
-# Spectrogrampy
+# spectrogram2d_py
 
 generate a spectrogram image from a wav file
 
