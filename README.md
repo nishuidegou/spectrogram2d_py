@@ -1,6 +1,6 @@
 # Spectrogrampy
 
-Your grandfatherly spectrogram generator friend.
+generate a spectrogram image from a wav file
 
 ## Examples and usage
 
